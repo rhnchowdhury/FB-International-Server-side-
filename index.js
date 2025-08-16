@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -53,6 +53,40 @@ async function run() {
     app.get("/expense", async (req, res) => {
       const cursor = userExpense.find();
       const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // get a expense by id
+    app.get("/expense/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await userExpense.findOne(query);
+      res.send(result);
+    });
+
+    // update a expense
+    app.patch("/expense/:id", async (req, res) => {
+      const id = req.params.id;
+      const expense = req.body;
+      const query = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateExpense = {
+        $set: {
+          title: expense.title,
+          amount: expense.amount,
+          select: expense.select,
+          date: expense.date,
+        },
+      };
+      const result = await userExpense.updateOne(query, updateExpense, options);
+      res.send(result);
+    });
+
+    // delete a expense
+    app.delete("/expense/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await userExpense.deleteOne(query);
       res.send(result);
     });
 
