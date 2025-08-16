@@ -26,6 +26,35 @@ async function run() {
     await client.connect();
 
     const userCollection = client.db("assignment").collection("fbUsers");
+    const userExpense = client.db("assignment").collection("fbExpense");
+
+    // user create
+    app.post("/users", async (req, res) => {
+      const users = req.body;
+      const result = await userCollection.insertOne(users);
+      res.send(result);
+    });
+
+    //  get users
+    app.get("/users", async (req, res) => {
+      const cursor = userCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    // expenses create
+    app.post("/expense", async (req, res) => {
+      const users = req.body;
+      const result = await userExpense.insertOne(users);
+      res.send(result);
+    });
+
+    //  get all expenses
+    app.get("/expense", async (req, res) => {
+      const cursor = userExpense.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
